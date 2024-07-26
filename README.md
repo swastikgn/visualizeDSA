@@ -1,4 +1,4 @@
-# Live : [swastikgn.com](visualize.swastikgn.com)
+# Live : [swastikgn.com](https://visualize.swastikgn.com)
 # Instructions to run the website 
 
 ```

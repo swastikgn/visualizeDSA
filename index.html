@@ -167,7 +167,6 @@
             See the minimum element being selected and moved step-by-step.
           </p>
         </a>
-
         <!-- Merge Sort -->
         <a href="src/html/merge_sort.html" class="algo-card p-6 rounded-2xl group">
           <div class="icon-box">
@@ -216,6 +215,36 @@
           <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Queue</h3>
           <p class="text-slate-400 text-sm leading-relaxed">
             FIFO (First-In-First-Out) flow. See how elements enter and leave the line.
+          </p>
+        </a>
+
+        <!-- Circular Queue -->
+        <a href="src/html/circular_queue.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Circular Queue</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            A ring buffer where the end connects back to the start. Watch the pointers rotate.
+          </p>
+        </a>
+
+        <!-- Deque -->
+        <a href="src/html/deque.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7h8M8 17h8M5 12h14m-3-3l3 3-3 3M8 9l-3 3 3 3" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Deque</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Double-Ended Queue. Insert and delete elements dynamically from both the front and rear.
           </p>
         </a>
 
@@ -268,6 +297,43 @@
           <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Brute Force Matching</h3>
           <p class="text-slate-400 text-sm leading-relaxed">
             Pattern matching in action. Watch the pointer slide over the text to find matches.
+          </p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Rate Limiting Section -->
+    <section id="rate_limiting" class="mb-16">
+      <div class="section-label">Rate Limiting</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Token Bucket -->
+        <a href="src/html/token_bucket.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m-8 7v6" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Token Bucket</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            API Rate Limiting. Watch tokens fill up over time and get consumed by incoming requests.
+          </p>
+        </a>
+
+        <!-- Leaky Bucket -->
+        <a href="src/html/leaky_bucket.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m-9 4h2m-2-4h2" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Leaky Bucket</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            API Rate Limiting. Requests flow into a bucket and leak out at a constant rate. Bursts are smoothed.
           </p>
         </a>
       </div>

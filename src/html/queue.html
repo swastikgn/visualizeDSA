@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/src/css/input.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <title>Queue | Visualize 3D</title>
+  <style>
+    /* ===== Dark mode CSS custom properties ===== */
+    :root {
+      --overlay-bg: rgba(0, 0, 0, 0.4);
+      --overlay-border: rgba(255, 255, 255, 0.08);
+      --subtle-bg: rgba(255, 255, 255, 0.06);
+      --subtle-border: rgba(255, 255, 255, 0.1);
+      --subtle-bg-hover: rgba(255, 255, 255, 0.15);
+      --code-header-color: rgba(255, 255, 255, 0.75);
+      --copy-btn-bg: rgba(255, 255, 255, 0.08);
+      --copy-btn-border: rgba(255, 255, 255, 0.12);
+      --copy-btn-color: rgba(255, 255, 255, 0.8);
+      --info-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.1));
+      --info-border: rgba(99, 102, 241, 0.25);
+      --badge-bg: rgba(255, 255, 255, 0.06);
+      --badge-border: rgba(255, 255, 255, 0.12);
+      --status-bg: rgba(255, 255, 255, 0.04);
+      --status-border: rgba(255, 255, 255, 0.08);
+      --canvas-border: rgba(255, 255, 255, 0.08);
+      --picker-border: rgba(255, 255, 255, 0.15);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    code,
+    pre {
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.85rem;
+    }
+
+    /* Code block wrapper */
+    .code-block {
+      position: relative;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid var(--overlay-border);
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 1.25rem;
+      padding-top: 2.5rem;
+      border-radius: 0.75rem;
+      max-height: 340px;
+      overflow: auto;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0.75rem;
+      background: var(--overlay-bg);
+      backdrop-filter: blur(6px);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      border-bottom: 1px solid var(--overlay-border);
+    }
+
+    .code-lang {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--code-header-color);
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: var(--copy-btn-bg);
+      border: 1px solid var(--copy-btn-border);
+      color: var(--copy-btn-color);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--subtle-bg-hover);
+    }
+
+    .copy-btn.copied {
+      background: rgba(72, 199, 142, 0.2);
+      border-color: rgba(72, 199, 142, 0.4);
+      color: #48c78e;
+    }
+
+    /* Color picker row */
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+    }
+
+    .color-row input[type="color"] {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--picker-border);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      padding: 2px;
+      background: transparent;
+    }
+
+    .color-row input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .color-row input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 0.35rem;
+    }
+
+    .color-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      opacity: 0.85;
+      flex: 1;
+    }
+
+    /* Canvas area */
+    #threed {
+      position: relative;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid var(--canvas-border);
+    }
+
+    #webgl {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16/10;
+    }
+
+    /* Speed slider */
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .speed-control input[type="range"] {
+      flex: 1;
+    }
+
+    /* Info card */
+    .info-card {
+      background: var(--info-bg);
+      border: 1px solid var(--info-border);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .info-card p {
+      line-height: 1.65;
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    /* Complexity badges */
+    .complexity-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    .badge-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 2rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: var(--status-bg);
+      border: 1px solid var(--status-border);
+      min-height: 2rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #48c78e;
+      flex-shrink: 0;
+    }
+
+    .status-dot.animating {
+      background: #f59e0b;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.4
+      }
+    }
+
+    /* Better collapse styling */
+    .collapse-title {
+      font-weight: 600 !important;
+      font-size: 0.95rem !important;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <div class="navbar bg-base-200 border-b border-base-300">
+    <div class="navbar-start">
+      <a href="/" class="btn btn-ghost normal-case font-bold text-primary gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+        Visualize DSA
+      </a>
+    </div>
+    <div class="navbar-center">
+      <span class="font-semibold text-lg opacity-80">Queue (FIFO)</span>
+    </div>
+    <div class="navbar-end"></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 p-4 max-w-screen-2xl mx-auto">
+
+    <!-- Left: 3D Visualization (3 cols) -->
+    <div class="lg:col-span-3 flex flex-col gap-4">
+      <div id="threed">
+        <canvas id="webgl"></canvas>
+      </div>
+
+      <!-- Controls bar -->
+      <div class="flex flex-wrap items-center gap-2">
+        <form id="myForm" class="contents">
+          <input type="text" id="array" placeholder="Value to enqueue..."
+            class="input input-bordered input-sm flex-1 min-w-[140px] font-mono" />
+          <button type="submit" id="submit_button" class="btn btn-primary btn-sm gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Enqueue
+          </button>
+          <button id="dequeue" type="button" class="btn btn-secondary btn-sm gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+            Dequeue
+          </button>
+          <button type="button" id="reset" class="btn btn-ghost btn-sm gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Reset
+          </button>
+        </form>
+      </div>
+
+      <!-- Status + Speed -->
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="status-bar flex-1">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Ready — enter an integer to enqueue</span>
+        </div>
+        <div class="speed-control w-48">
+          <span class="text-xs font-medium opacity-60">Speed</span>
+          <input type="range" id="speedSlider" min="0.1" max="1" step="0.05" value="0.7"
+            class="range range-xs range-primary" />
+        </div>
+      </div>
+
+      <!-- Customization panel -->
+      <div class="collapse collapse-arrow bg-base-200 rounded-xl border border-base-300">
+        <input type="checkbox" />
+        <div class="collapse-title">🎨 Customize Colors</div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+            <div class="color-row">
+              <input type="color" id="scene_background" value="#2e2e2e" />
+              <span class="color-label">Scene Background</span>
+            </div>
+            <div class="color-row">
+              <input type="color" id="cube_color" value="#facc15" />
+              <span class="color-label">Element Color</span>
+            </div>
+            <div class="color-row">
+              <input type="color" id="text_color" value="#000000" />
+              <span class="color-label">Value Color</span>
+            </div>
+            <div class="color-row">
+              <input type="color" id="arrow_color" value="#ef4444" />
+              <span class="color-label">Pointer Color</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Info + Code (2 cols) -->
+    <div class="lg:col-span-2 flex flex-col gap-4">
+
+      <!-- Algorithm Info -->
+      <div class="info-card">
+        <h2 class="font-bold text-lg mb-2">🚥 Queue (FIFO)</h2>
+        <p id="tts-text">
+          A Queue is a linear data structure that follows the <b>First-In-First-Out (FIFO)</b> principle.
+          The first element added to the queue is the first one to be removed. Think of a line at a store—customers
+          join at the "rear" and leave from the "front."
+        </p>
+        <div class="complexity-badges">
+          <span class="badge-item">⏱ Access: O(n)</span>
+          <span class="badge-item">⏱ Search: O(n)</span>
+          <span class="badge-item">⏱ Enqueue: O(1)</span>
+          <span class="badge-item">⏱ Dequeue: O(1)</span>
+          <span class="badge-item">💾 Space: O(n)</span>
+        </div>
+      </div>
+
+      <!-- Python Code -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Python</span>
+          <button class="copy-btn" data-target="python-code" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code id="python-code" class="language-python">from collections import deque
+
+class Queue:
+    def __init__(self):
+        self.items = deque()
+
+    def enqueue(self, item):
+        self.items.append(item)
+
+    def dequeue(self):
+        if not self.is_empty():
+            return self.items.popleft()
+
+    def is_empty(self):
+        return len(self.items) == 0</code></pre>
+      </div>
+
+      <!-- JavaScript Code -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">JavaScript</span>
+          <button class="copy-btn" data-target="js-code" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code id="js-code" class="language-javascript">class Queue {
+    constructor() {
+        this.items = [];
+    }
+
+    enqueue(element) {
+        this.items.push(element);
+    }
+
+    dequeue() {
+        if (this.isEmpty()) return null;
+        return this.items.shift();
+    }
+
+    isEmpty() {
+        return this.items.length === 0;
+    }
+}</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Copy function -->
+  <script>
+    function copyCode(btn) {
+      const id = btn.getAttribute('data-target');
+      const code = document.getElementById(id);
+      navigator.clipboard.writeText(code.textContent).then(() => {
+        btn.classList.add('copied');
+        btn.innerHTML = `Copied!`;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `Copy`;
+        }, 2000);
+      });
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script type="module" src="/src/javascript/queue.js"></script>
+</body>
+
+</html>

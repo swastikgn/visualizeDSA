@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/src/css/input.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <title>Visualize DSA | 3D Algorithm Animations</title>
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-bg: rgba(255, 255, 255, 0.06);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+      min-height: 100vh;
+    }
+
+    .hero-gradient-text {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .algo-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(12px);
+    }
+
+    .algo-card:hover {
+      background: var(--card-hover-bg);
+      border-color: rgba(168, 85, 247, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -12px rgba(168, 85, 247, 0.5);
+    }
+
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(99, 102, 241, 0.1);
+      color: #818cf8;
+      margin-bottom: 1.25rem;
+    }
+
+    .algo-card:hover .icon-box {
+      background: var(--primary-gradient);
+      color: white;
+      transform: scale(1.1);
+      transition: all 0.3s ease;
+    }
+
+    .glass-nav {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+
+<body class="text-slate-200">
+  <!-- Navigation -->
+  <nav class="navbar glass-nav sticky top-0 z-50 px-6">
+    <div class="navbar-start">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white">V</div>
+        <span class="font-extrabold text-xl tracking-tight">Visualize <span class="hero-gradient-text">DSA</span></span>
+      </div>
+    </div>
+    <div class="navbar-end">
+      <a href="https://github.com/swastikgn/visualizeDSA" target="_blank" class="btn btn-ghost btn-sm gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+        </svg>
+        GitHub
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="max-w-6xl mx-auto pt-20 pb-16 px-6 text-center">
+    <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+      Study Algorithms & Data Structures in <span class="hero-gradient-text">3D Space</span>
+    </h1>
+    <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+      A premium interactive visualization tool to master data structures and algorithms through immersive 3D
+      experiences.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="#sorting" class="btn btn-primary px-8">Explore Visualizations</a>
+      <a href="#controls" class="btn btn-outline px-8">How to use</a>
+    </div>
+  </header>
+
+  <!-- Grid Section -->
+  <main class="max-w-7xl mx-auto px-6 pb-24">
+
+    <!-- Sorting Section -->
+    <section id="sorting" class="mb-16">
+      <div class="section-label">Sorting Algorithms</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Bubble Sort -->
+        <a href="src/html/bubble_sort.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Bubble Sort</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Visualize the classic swapping algorithm. Watch adjacent elements bubble up to their correct position in 3D.
+          </p>
+        </a>
+
+        <!-- Selection Sort -->
+        <a href="src/html/selection_sort.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Selection Sort</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            See the minimum element being selected and moved step-by-step.
+          </p>
+        </a>
+
+        <!-- Merge Sort -->
+        <a href="src/html/merge_sort.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 7v10M4 7h16M4 17h16M20 7v10M9 7v10M14 7v10" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Merge Sort</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Witness the power of divide and conquer. Watch the array split and merge back in order.
+          </p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Data Structures Section -->
+    <section id="ds" class="mb-16">
+      <div class="section-label">Data Structures</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Stack -->
+        <a href="src/html/stack.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Stack</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            LIFO (Last-In-First-Out) operations. Visualize Push and Pop operations on a 3D stack.
+          </p>
+        </a>
+
+        <!-- Queue -->
+        <a href="src/html/queue.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Queue</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            FIFO (First-In-First-Out) flow. See how elements enter and leave the line.
+          </p>
+        </a>
+
+        <!-- BST -->
+        <a href="src/html/binary_search_tree.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Binary Search Tree</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Explore hierarchical data. Watch nodes being inserted and searching through the tree structure.
+          </p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Others Section -->
+    <section id="others" class="mb-16">
+      <div class="section-label">Searching & Strings</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Binary Search -->
+        <a href="src/html/binary_search.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Binary Search</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Divide and conquer. Watch how the search space halves in every step.
+          </p>
+        </a>
+
+        <!-- String Matching -->
+        <a href="src/html/brute_force_string_matching.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-4.44-5.07c.385.39.792.75 1.211 1.079m12.727-6.31c-.201-.137-.41-.264-.627-.38m-11.458 5.613c.731.81 1.488 1.517 2.27 2.112a14.53 14.53 0 005.152 2.686m-5.152-2.686a14.49 14.49 0 01-5.152-2.686m5.152 2.686c.662.483 1.346.903 2.05 1.256m8.257-8.257a14.501 14.501 0 00-6.216-4.832m3.287 3.287a14.502 14.502 0 01-3.287 3.287m0-3.287a14.503 14.503 0 013.287 3.287m-3.287-3.287l3.287 3.287" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Brute Force Matching</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Pattern matching in action. Watch the pointer slide over the text to find matches.
+          </p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Instructions -->
+    <section id="controls" class="bg-indigo-950/20 border border-indigo-500/20 rounded-3xl p-8 md:p-12">
+      <div class="flex flex-col md:flex-row gap-12 items-center">
+        <div class="flex-1">
+          <h2 class="text-3xl font-bold mb-6">Interaction Guide</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="flex items-start gap-4">
+              <div class="mt-1 p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-bold mb-1">Zoom</h4>
+                <p class="text-slate-400 text-sm">Use your mouse wheel to zoom in and out of the scene.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="mt-1 p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path d="M7 11l5-5m0 0l5 5m-5-5v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-bold mb-1">Rotate</h4>
+                <p class="text-slate-400 text-sm">Right click and drag to rotate the camera around the visualization.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="mt-1 p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-bold mb-1">Pan</h4>
+                <p class="text-slate-400 text-sm">Hold <kbd class="kbd kbd-xs">Ctrl</kbd> + Right click to move the
+                  camera horizontally/vertically.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="mt-1 p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-bold mb-1">Reset</h4>
+                <p class="text-slate-400 text-sm">Double click anywhere to reset the camera to its original position.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hidden lg:block relative">
+          <div
+            class="w-64 h-64 bg-indigo-600/20 blur-[100px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full">
+          </div>
+          <img src="https://img.icons8.com/isometric/512/3d-glasses.png" alt="3D Visualization"
+            class="w-48 h-48 relative z-10 drop-shadow-2xl grayscale brightness-150 opacity-20">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-7xl mx-auto px-6 py-12 border-t border-slate-800 text-center text-slate-500 text-sm">
+    <p>© 2026 Visualize DSA. Built with Three.js & Tailwind CSS.</p>
+  </footer>
+</body>
+
+</html>

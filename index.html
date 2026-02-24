@@ -97,10 +97,11 @@
   <!-- Navigation -->
   <nav class="navbar glass-nav sticky top-0 z-50 px-6">
     <div class="navbar-start">
-      <div class="flex items-center gap-2">
+      <a href="/" class="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
         <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white">V</div>
-        <span class="font-extrabold text-xl tracking-tight">Visualize <span class="hero-gradient-text">DSA</span></span>
-      </div>
+        <span class="font-extrabold text-xl tracking-tight text-slate-200">Visualize <span
+            class="hero-gradient-text">DSA</span></span>
+      </a>
     </div>
     <div class="navbar-end">
       <a href="https://github.com/swastikgn/visualizeDSA" target="_blank" class="btn btn-ghost btn-sm gap-2">
@@ -179,6 +180,20 @@
           <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Merge Sort</h3>
           <p class="text-slate-400 text-sm leading-relaxed">
             Witness the power of divide and conquer. Watch the array split and merge back in order.
+          </p>
+        </a>
+
+        <!-- Quick Sort -->
+        <a href="src/html/quick_sort.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Quick Sort</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Fastest general-purpose sorting. Visualize partitioning and pivot selection in 3D.
           </p>
         </a>
       </div>
@@ -260,6 +275,36 @@
           <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Binary Search Tree</h3>
           <p class="text-slate-400 text-sm leading-relaxed">
             Explore hierarchical data. Watch nodes being inserted and searching through the tree structure.
+          </p>
+        </a>
+
+        <!-- Linked List -->
+        <a href="src/html/linked_list.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Singly Linked List</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Dynamic data structure. Watch nodes connect and disconnect with animated pointers.
+          </p>
+        </a>
+
+        <!-- Doubly Linked List -->
+        <a href="src/html/doubly_linked_list.html" class="algo-card p-6 rounded-2xl group">
+          <div class="icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7h8M8 17h8M5 12h14m-3-3l3 3-3 3M8 9l-3 3 3 3" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">Doubly Linked List</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Bidirectional data structure. Watch nodes connect in both directions with animated pointers.
           </p>
         </a>
       </div>

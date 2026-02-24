@@ -132,15 +132,15 @@ function createElement(char, index, isPattern) {
   textMesh.position.set(-textW / 2, -0.3, 0.61);
   group.add(textMesh);
 
-  // Index (only for Text, not pattern)
-  if (!isPattern) {
-    const idxGeo = new TextGeometry(index.toString(), { font: globalFont, size: 0.3, height: 0.05 });
-    idxGeo.computeBoundingBox();
-    const idxW = idxGeo.boundingBox.max.x - idxGeo.boundingBox.min.x;
-    const idxMesh = new THREE.Mesh(idxGeo, textMat);
-    idxMesh.position.set(-idxW / 2, 0.8, 0); // Above the cube
-    group.add(idxMesh);
-  }
+  // Index
+  const idxGeo = new TextGeometry(index.toString(), { font: globalFont, size: 0.3, height: 0.05 });
+  idxGeo.computeBoundingBox();
+  const idxW = idxGeo.boundingBox.max.x - idxGeo.boundingBox.min.x;
+  const idxMesh = new THREE.Mesh(idxGeo, textMat);
+  // Text (isPattern=false) index above (0.8), Pattern (isPattern=true) index below (-1.1)
+  const idxY = isPattern ? -1.1 : 0.8;
+  idxMesh.position.set(-idxW / 2, idxY, 0);
+  group.add(idxMesh);
 
   group.userData = { char: char, isMatched: false };
   return group;
@@ -222,8 +222,8 @@ async function animateMatch() {
     setStatus(`Aligning pattern at index ${i}...`, true);
 
     // Slide Pattern Base Position
-    const targetX = textStartX + (i * 1.5) - patternGroup.children[0].position.x; // calculate how much to shift the ENTIRE group
-
+    // The pattern group is initially built with its first character at textStartX (local x = 0)
+    // To align pattern[0] with text[i], we need to shift the pattern group world X to textStartX + i * 1.5
     await gsap.to(patternGroup.position, {
       x: i * 1.5,
       duration: 0.6 * speed,
@@ -296,17 +296,20 @@ async function animateMatch() {
 }
 
 // --- Handlers ---
-document.getElementById("myForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+const textInput = document.getElementById("text");
+const patternInput = document.getElementById("pattern");
+
+const handleInput = () => {
   if (isAnimating) return;
-  const textStr = document.getElementById("text").value;
-  const patternStr = document.getElementById("pattern").value;
+  const textStr = textInput.value;
+  const patternStr = patternInput.value;
   if (textStr && patternStr) {
     buildStrings(textStr, patternStr);
-  } else {
-    setStatus("Please enter both text and pattern.", true);
   }
-});
+};
+
+textInput.addEventListener("input", handleInput);
+patternInput.addEventListener("input", handleInput);
 
 document.getElementById("animate").addEventListener("click", () => {
   if (isAnimating || !textGroup || !patternGroup) {

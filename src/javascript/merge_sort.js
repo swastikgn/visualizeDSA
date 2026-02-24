@@ -111,107 +111,85 @@ function createCubes() {
     setStatus(`Created array of ${array.length} elements`);
 }
 
-async function mergeSort(startIndex, endIndex, depth = 0) {
-    if (startIndex >= endIndex) return;
+async function mergeSortRecursive(start, end, depth = 0) {
+    if (start >= end) return;
 
-    const mid = Math.floor((startIndex + endIndex) / 2);
-    const currentY = 6 - (depth * 2);
-    const nextY = 6 - ((depth + 1) * 2);
+    const mid = Math.floor((start + end) / 2);
+    const nextY = 6 - (depth + 1) * 2.5;
 
-    // Visual Divide: Move halves DOWN and SLIGHTLY APART
-    setStatus(`Level ${depth}: Dividing... sub-arrays descending.`, true);
-    await animateDivision(startIndex, mid, endIndex, nextY, depth);
-
-    await mergeSort(startIndex, mid, depth + 1);
-    await mergeSort(mid + 1, endIndex, depth + 1);
-
-    // Visual Merge: Combine elements back UP
-    await merge(startIndex, mid, endIndex, currentY, depth);
-}
-
-async function animateDivision(start, mid, end, targetY, depth) {
-    const duration = getSpeed() * 1.5;
-    const spreadX = 1.0 / (depth + 1);
-
+    // Visual Divide
+    setStatus(`Dividing [${start}-${end}] at depth ${depth}...`, true);
     const tl = gsap.timeline();
+    const duration = getSpeed() * 1.0;
+
+    // Spread apart horizontally and move down
+    const spreadOffset = (depth + 1) * 0.5;
+
     for (let i = start; i <= mid; i++) {
         tl.to(container[i].position, {
-            y: targetY,
-            x: container[i].position.x - spreadX,
+            y: nextY,
+            x: container[i].position.x - spreadOffset,
             duration: duration,
             ease: "power2.inOut"
         }, 0);
     }
     for (let i = mid + 1; i <= end; i++) {
         tl.to(container[i].position, {
-            y: targetY,
-            x: container[i].position.x + spreadX,
+            y: nextY,
+            x: container[i].position.x + spreadOffset,
             duration: duration,
             ease: "power2.inOut"
         }, 0);
     }
     await sleep(duration * 1000 + 100);
+
+    await mergeSortRecursive(start, mid, depth + 1);
+    await mergeSortRecursive(mid + 1, end, depth + 1);
+
+    // Merge
+    await mergeStep(start, mid, end, depth);
 }
 
-async function merge(start, mid, end, targetY, depth) {
-    setStatus(`Level ${depth}: Merging back up to parent level...`, true);
+async function mergeStep(start, mid, end, depth) {
+    const parentY = 6 - depth * 2.5;
+    const spacing = 1.3;
+    const arrayStartX = -((array.length - 1) * spacing) / 2;
+
+    setStatus(`Merging subarrays back to level ${depth}...`, true);
 
     let left = container.slice(start, mid + 1);
     let right = container.slice(mid + 1, end + 1);
+    let merged = [];
 
-    let i = 0, j = 0, k = start;
-    let sortedSubset = [];
-
-    const spacing = 1.3;
-    const startX = -((array.length - 1) * spacing) / 2;
-
-    while (i < left.length && j < right.length) {
-        left[i].children[0].material.color.set(highlightColor);
-        right[j].children[0].material.color.set(highlightColor);
-        await sleep(getSpeed() * 400);
-
-        if (parseInt(left[i].name) <= parseInt(right[j].name)) {
-            left[i].children[0].material.color.set(sortedColor);
-            right[j].children[0].material.color.set(cubeColor);
-            sortedSubset.push(left[i]);
+    let i = 0, j = 0;
+    while (i < left.length || j < right.length) {
+        let selected;
+        if (i < left.length && (j >= right.length || parseInt(left[i].name) <= parseInt(right[j].name))) {
+            selected = left[i];
             i++;
         } else {
-            right[j].children[0].material.color.set(sortedColor);
-            left[i].children[0].material.color.set(cubeColor);
-            sortedSubset.push(right[j]);
+            selected = right[j];
             j++;
         }
 
-        const targetX = startX + k * spacing;
-        await gsap.to(sortedSubset[sortedSubset.length - 1].position, {
+        merged.push(selected);
+        const k = start + merged.length - 1;
+        const targetX = arrayStartX + k * spacing;
+
+        selected.children[0].material.color.set(highlightColor);
+        await gsap.to(selected.position, {
             x: targetX,
-            y: targetY,
-            duration: getSpeed() * 2,
-            ease: "back.out(1.2)"
+            y: parentY,
+            duration: getSpeed() * 0.8,
+            ease: "power2.out"
         });
-        k++;
+        selected.children[0].material.color.set(depth === 0 ? sortedColor : cubeColor);
+        await sleep(getSpeed() * 200);
     }
 
-    while (i < left.length) {
-        sortedSubset.push(left[i]);
-        const targetX = startX + k * spacing;
-        gsap.to(left[i].position, { x: targetX, y: targetY, duration: getSpeed() * 1.5 });
-        left[i].children[0].material.color.set(sortedColor);
-        i++; k++;
-        await sleep(getSpeed() * 100);
-    }
-
-    while (j < right.length) {
-        sortedSubset.push(right[j]);
-        const targetX = startX + k * spacing;
-        gsap.to(right[j].position, { x: targetX, y: targetY, duration: getSpeed() * 1.5 });
-        right[j].children[0].material.color.set(sortedColor);
-        j++; k++;
-        await sleep(getSpeed() * 100);
-    }
-
-    for (let idx = 0; idx < sortedSubset.length; idx++) {
-        container[start + idx] = sortedSubset[idx];
+    // Update global container reference for this range
+    for (let idx = 0; idx < merged.length; idx++) {
+        container[start + idx] = merged[idx];
     }
 }
 
@@ -221,7 +199,7 @@ document.getElementById("myForm").addEventListener("submit", (e) => {
     e.preventDefault();
     if (isSorting) return;
     const val = document.getElementById("array").value;
-    array = val.split(/[ ,]+/).filter(Boolean).map(Number).slice(0, 8); // Optimized for tree clarity
+    array = val.split(/[ ,]+/).filter(Boolean).map(Number).slice(0, 8);
     createCubes();
 });
 
@@ -229,29 +207,28 @@ document.getElementById("animate").onclick = async () => {
     if (isSorting || container.length === 0) return;
     isSorting = true;
 
-    indexMeshes.forEach(m => gsap.to(m.material, { opacity: 0, duration: 0.5 }));
+    // Hide indices initially
+    indexMeshes.forEach(m => gsap.to(m.material, { opacity: 0, duration: 0.3 }));
 
-    container.forEach(g => {
+    // Reset positions to top
+    container.forEach((g, i) => {
         g.position.y = 6;
         g.children[0].material.color.set(cubeColor);
     });
 
-    await mergeSort(0, container.length - 1, 0);
+    await mergeSortRecursive(0, container.length - 1, 0);
 
-    // Reposition and show indices on a fixed horizontal line
+    // Reposition and show indices
+    const spacing = 1.3;
+    const startX = -((array.length - 1) * spacing) / 2;
     indexMeshes.forEach((m, idx) => {
-        // Center the index mesh under the cube
-        const box = new THREE.Box3().setFromObject(m);
-        const width = box.max.x - box.min.x;
-
-        m.position.x = container[idx].position.x - width / 2;
-        m.position.y = 6 - 1.2; // Fixed baseline at the root level
+        m.position.x = startX + idx * spacing - 0.1; // adjust for text center
+        m.position.y = 6 - 1.2;
         gsap.to(m.material, { opacity: 0.5, duration: 0.5 });
     });
 
     isSorting = false;
-    setStatus("Sort Complete! Root level restored and sorted.", false);
-    container.forEach(g => g.children[0].material.color.set(sortedColor));
+    setStatus("Merge Sort Complete!", false);
 };
 
 document.getElementById("reset").onclick = () => {

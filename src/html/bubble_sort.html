@@ -30,6 +30,14 @@
       --status-border: rgba(255, 255, 255, 0.08);
       --canvas-border: rgba(255, 255, 255, 0.08);
       --picker-border: rgba(255, 255, 255, 0.15);
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    }
+
+    .hero-gradient-text {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     body {
@@ -263,13 +271,12 @@
 
 <body>
   <!-- Navigation -->
-  <div class="navbar bg-base-200 border-b border-base-300">
+  <div class="navbar bg-base-200 border-b border-base-300 px-4">
     <div class="navbar-start">
-      <a href="/" class="btn btn-ghost normal-case font-bold text-primary gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
-        Visualize DSA
+      <a href="/" class="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white">V</div>
+        <span class="font-extrabold text-xl tracking-tight text-slate-200">Visualize <span
+            class="hero-gradient-text">DSA</span></span>
       </a>
     </div>
     <div class="navbar-center">
@@ -409,47 +416,6 @@
     return arr</code></pre>
       </div>
 
-      <!-- C Code -->
-      <div class="code-block">
-        <div class="code-header">
-          <span class="code-lang">C</span>
-          <button class="copy-btn" data-target="c-code" onclick="copyCode(this)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            Copy
-          </button>
-        </div>
-        <pre><code id="c-code" class="language-c">#include &lt;stdio.h&gt;
-
-void bubbleSort(int arr[], int n) {
-    for (int i = 0; i &lt; n - 1; i++) {
-        int swapped = 0;
-        for (int j = 0; j &lt; n - i - 1; j++) {
-            if (arr[j] &gt; arr[j + 1]) {
-                int temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
-                swapped = 1;
-            }
-        }
-        if (!swapped) break;
-    }
-}
-
-int main() {
-    int data[] = {-2, 45, 0, 11, -9};
-    int n = sizeof(data) / sizeof(data[0]);
-    bubbleSort(data, n);
-    printf("Sorted Array:\n");
-    for (int i = 0; i &lt; n; i++)
-        printf("%d ", data[i]);
-    return 0;
-}</code></pre>
-      </div>
-
       <!-- JavaScript Code -->
       <div class="code-block">
         <div class="code-header">
@@ -500,7 +466,6 @@ int main() {
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
   <script type="module" src="/src/javascript/bubble_sort.js"></script>
 </body>

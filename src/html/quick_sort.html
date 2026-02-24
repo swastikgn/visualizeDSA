@@ -9,9 +9,8 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <title>Merge Sort | Visualize 3D</title>
+    <title>Quick Sort | Visualize 3D</title>
     <style>
-        /* ===== Dark mode CSS custom properties ===== */
         :root {
             --overlay-bg: rgba(0, 0, 0, 0.4);
             --overlay-border: rgba(255, 255, 255, 0.08);
@@ -29,7 +28,6 @@
             --status-bg: rgba(255, 255, 255, 0.04);
             --status-border: rgba(255, 255, 255, 0.08);
             --canvas-border: rgba(255, 255, 255, 0.08);
-            --picker-border: rgba(255, 255, 255, 0.15);
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         }
 
@@ -123,20 +121,11 @@
         .color-row input[type="color"] {
             width: 36px;
             height: 36px;
-            border: 2px solid var(--picker-border);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             border-radius: 0.5rem;
             cursor: pointer;
             padding: 2px;
             background: transparent;
-        }
-
-        .color-row input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-
-        .color-row input[type="color"]::-webkit-color-swatch {
-            border: none;
-            border-radius: 0.35rem;
         }
 
         .color-label {
@@ -238,16 +227,10 @@
                 opacity: 0.4
             }
         }
-
-        .collapse-title {
-            font-weight: 600 !important;
-            font-size: 0.95rem !important;
-        }
     </style>
 </head>
 
 <body>
-    <!-- Navigation -->
     <div class="navbar bg-base-200 border-b border-base-300 px-4">
         <div class="navbar-start">
             <a href="/" class="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
@@ -257,13 +240,11 @@
                         class="hero-gradient-text">DSA</span></span>
             </a>
         </div>
-        <div class="navbar-center"><span class="font-semibold text-lg opacity-80">Merge Sort</span></div>
+        <div class="navbar-center"><span class="font-semibold text-lg opacity-80">Quick Sort</span></div>
         <div class="navbar-end"></div>
     </div>
 
-    <!-- Main content -->
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 p-4 max-w-screen-2xl mx-auto">
-        <!-- Left: 3D Visualization (3 cols) -->
         <div class="lg:col-span-3 flex flex-col gap-4">
             <div id="threed"><canvas id="webgl"></canvas></div>
 
@@ -271,29 +252,9 @@
                 <form id="myForm" class="contents">
                     <input type="text" id="array" placeholder="e.g. 5, 3, 8, 1, 9"
                         class="input input-bordered input-sm flex-1 min-w-[140px] font-mono" />
-                    <button type="submit" id="submit_button" class="btn btn-primary btn-sm gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Create
-                    </button>
-                    <button id="animate" type="button" class="btn btn-secondary btn-sm gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        </svg>
-                        Sort
-                    </button>
-                    <button type="button" id="reset" class="btn btn-ghost btn-sm gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Reset
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm">Create</button>
+                    <button id="animate" type="button" class="btn btn-secondary btn-sm">Sort</button>
+                    <button type="button" id="reset" class="btn btn-ghost btn-sm">Reset</button>
                 </form>
             </div>
 
@@ -315,13 +276,11 @@
                 <div class="collapse-content">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                         <div class="color-row"><input type="color" id="scene_background" value="#2e2e2e" /><span
-                                class="color-label">Scene Background</span></div>
+                                class="color-label">Background</span></div>
                         <div class="color-row"><input type="color" id="cube_color" value="#ef4444" /><span
                                 class="color-label">Cube Color</span></div>
-                        <div class="color-row"><input type="color" id="cube_change_color" value="#ffffff" /><span
-                                class="color-label">Highlight Color</span></div>
-                        <div class="color-row"><input type="color" id="text_color" value="#facc15" /><span
-                                class="color-label">Text Color</span></div>
+                        <div class="color-row"><input type="color" id="pivot_color" value="#facc15" /><span
+                                class="color-label">Pivot Color</span></div>
                         <div class="color-row"><input type="color" id="sorted_color" value="#22c55e" /><span
                                 class="color-label">Sorted Color</span></div>
                     </div>
@@ -329,62 +288,61 @@
             </div>
         </div>
 
-        <!-- Right: Info + Code -->
         <div class="lg:col-span-2 flex flex-col gap-4">
             <div class="info-card">
-                <h2 class="font-bold text-lg mb-2">📊 Merge Sort</h2>
-                <p>Merge sort is a recursive divide-and-conquer algorithm that divide the input array into two halves,
-                    calls itself for the two halves, and then merges the two sorted halves.</p>
+                <h2 class="font-bold text-lg mb-2">⚡ Quick Sort</h2>
+                <p>Quick Sort is a highly efficient, divide-and-conquer sorting algorithm. It picks an element as a
+                    'pivot' and partitions the array around it.</p>
                 <div class="complexity-badges">
                     <span class="badge-item">⏱ Best: O(n log n)</span>
                     <span class="badge-item">⏱ Average: O(n log n)</span>
-                    <span class="badge-item">⏱ Worst: O(n log n)</span>
-                    <span class="badge-item">💾 Space: O(n)</span>
-                    <span class="badge-item">✅ Stable</span>
+                    <span class="badge-item">⏱ Worst: O(n²)</span>
+                    <span class="badge-item">💾 Space: O(log n)</span>
                 </div>
             </div>
 
             <div class="code-block">
                 <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn"
                         data-target="python-code" onclick="copyCode(this)">Copy</button></div>
-                <pre><code id="python-code" class="language-python">def merge_sort(arr):
-    if len(arr) > 1:
-        mid = len(arr) // 2
-        L = arr[:mid]
-        R = arr[mid:]
-        merge_sort(L)
-        merge_sort(R)
-        i = j = k = 0
-        while i < len(L) and j < len(R):
-            if L[i] < R[j]:
-                arr[k] = L[i]; i += 1
-            else:
-                arr[k] = R[j]; j += 1
-            k += 1
-        while i < len(L):
-            arr[k] = L[i]; i += 1; k += 1
-        while j < len(R):
-            arr[k] = R[j]; j += 1; k += 1</code></pre>
+                <pre><code id="python-code" class="language-python">def quick_sort(arr, low, high):
+    if low &lt; high:
+        pi = partition(arr, low, high)
+        quick_sort(arr, low, pi - 1)
+        quick_sort(arr, pi + 1, high)
+
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] &lt; pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1</code></pre>
             </div>
 
             <div class="code-block">
                 <div class="code-header"><span class="code-lang">JavaScript</span><button class="copy-btn"
                         data-target="js-code" onclick="copyCode(this)">Copy</button></div>
-                <pre><code id="js-code" class="language-javascript">function mergeSort(arr) {
-  if (arr.length <= 1) return arr;
-  const mid = Math.floor(arr.length / 2);
-  const left = mergeSort(arr.slice(0, mid));
-  const right = mergeSort(arr.slice(mid));
-  return merge(left, right);
+                <pre><code id="js-code" class="language-javascript">function quickSort(arr, low, high) {
+  if (low &lt; high) {
+    let pi = partition(arr, low, high);
+    quickSort(arr, low, pi - 1);
+    quickSort(arr, pi + 1, high);
+  }
 }
 
-function merge(left, right) {
-  let result = [], i = 0, j = 0;
-  while (i < left.length && j < right.length) {
-    if (left[i] < right[j]) result.push(left[i++]);
-    else result.push(right[j++]);
+function partition(arr, low, high) {
+  let pivot = arr[high];
+  let i = low - 1;
+  for (let j = low; j &lt; high; j++) {
+    if (arr[j] &lt; pivot) {
+      i++;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
   }
-  return result.concat(left.slice(i)).concat(right.slice(j));
+  [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+  return i + 1;
 }</code></pre>
             </div>
         </div>
@@ -403,7 +361,7 @@ function merge(left, right) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script type="module" src="/src/javascript/merge_sort.js"></script>
+    <script type="module" src="/src/javascript/quick_sort.js"></script>
 </body>
 
 </html>

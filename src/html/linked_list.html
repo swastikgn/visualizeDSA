@@ -9,9 +9,8 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <title>Merge Sort | Visualize 3D</title>
+    <title>Singly Linked List | Visualize 3D</title>
     <style>
-        /* ===== Dark mode CSS custom properties ===== */
         :root {
             --overlay-bg: rgba(0, 0, 0, 0.4);
             --overlay-border: rgba(255, 255, 255, 0.08);
@@ -29,7 +28,6 @@
             --status-bg: rgba(255, 255, 255, 0.04);
             --status-border: rgba(255, 255, 255, 0.08);
             --canvas-border: rgba(255, 255, 255, 0.08);
-            --picker-border: rgba(255, 255, 255, 0.15);
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         }
 
@@ -107,45 +105,6 @@
             background: var(--subtle-bg-hover);
         }
 
-        .copy-btn.copied {
-            background: rgba(72, 199, 142, 0.2);
-            border-color: rgba(72, 199, 142, 0.4);
-            color: #48c78e;
-        }
-
-        .color-row {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.5rem 0;
-        }
-
-        .color-row input[type="color"] {
-            width: 36px;
-            height: 36px;
-            border: 2px solid var(--picker-border);
-            border-radius: 0.5rem;
-            cursor: pointer;
-            padding: 2px;
-            background: transparent;
-        }
-
-        .color-row input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-
-        .color-row input[type="color"]::-webkit-color-swatch {
-            border: none;
-            border-radius: 0.35rem;
-        }
-
-        .color-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            opacity: 0.85;
-            flex: 1;
-        }
-
         #threed {
             position: relative;
             border-radius: 0.75rem;
@@ -156,7 +115,7 @@
         #webgl {
             display: block;
             width: 100%;
-            aspect-ratio: 16/10;
+            aspect-ratio: 16/9;
         }
 
         .speed-control {
@@ -176,29 +135,11 @@
             padding: 1rem 1.25rem;
         }
 
-        .info-card p {
-            line-height: 1.65;
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-
         .complexity-badges {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
             margin-top: 0.75rem;
-        }
-
-        .badge-item {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.3rem 0.7rem;
-            border-radius: 2rem;
-            font-size: 0.78rem;
-            font-weight: 500;
-            background: var(--badge-bg);
-            border: 1px solid var(--badge-border);
         }
 
         .status-bar {
@@ -222,7 +163,7 @@
             flex-shrink: 0;
         }
 
-        .status-dot.sorting {
+        .status-dot.animating {
             background: #f59e0b;
             animation: pulse 1s infinite;
         }
@@ -238,16 +179,10 @@
                 opacity: 0.4
             }
         }
-
-        .collapse-title {
-            font-weight: 600 !important;
-            font-size: 0.95rem !important;
-        }
     </style>
 </head>
 
 <body>
-    <!-- Navigation -->
     <div class="navbar bg-base-200 border-b border-base-300 px-4">
         <div class="navbar-start">
             <a href="/" class="flex items-center gap-2 no-underline hover:opacity-80 transition-opacity">
@@ -257,50 +192,36 @@
                         class="hero-gradient-text">DSA</span></span>
             </a>
         </div>
-        <div class="navbar-center"><span class="font-semibold text-lg opacity-80">Merge Sort</span></div>
+        <div class="navbar-center"><span class="font-semibold text-lg opacity-80">Singly Linked List</span></div>
         <div class="navbar-end"></div>
     </div>
 
-    <!-- Main content -->
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 p-4 max-w-screen-2xl mx-auto">
-        <!-- Left: 3D Visualization (3 cols) -->
         <div class="lg:col-span-3 flex flex-col gap-4">
             <div id="threed"><canvas id="webgl"></canvas></div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <form id="myForm" class="contents">
-                    <input type="text" id="array" placeholder="e.g. 5, 3, 8, 1, 9"
-                        class="input input-bordered input-sm flex-1 min-w-[140px] font-mono" />
-                    <button type="submit" id="submit_button" class="btn btn-primary btn-sm gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Create
-                    </button>
-                    <button id="animate" type="button" class="btn btn-secondary btn-sm gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        </svg>
-                        Sort
-                    </button>
-                    <button type="button" id="reset" class="btn btn-ghost btn-sm gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Reset
-                    </button>
-                </form>
+                <div class="input-group flex items-center gap-1">
+                    <input type="number" id="value-input" placeholder="Value"
+                        class="input input-bordered input-sm w-20" />
+                    <input type="number" id="index-input" placeholder="Index"
+                        class="input input-bordered input-sm w-20" />
+                </div>
+                <div class="btn-group flex gap-1 flex-wrap">
+                    <button id="add-head" class="btn btn-primary btn-sm">Add Head</button>
+                    <button id="add-tail" class="btn btn-primary btn-sm">Add Tail</button>
+                    <button id="add-index" class="btn btn-primary btn-sm">Add at Index</button>
+                    <button id="remove-head" class="btn btn-error btn-sm">Del Head</button>
+                    <button id="remove-tail" class="btn btn-error btn-sm">Del Tail</button>
+                    <button id="remove-index" class="btn btn-error btn-sm">Del at Index</button>
+                    <button id="clear-list" class="btn btn-ghost btn-sm">Clear</button>
+                </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
                 <div class="status-bar flex-1">
                     <div class="status-dot" id="statusDot"></div>
-                    <span id="statusText">Ready — enter numbers and click Create</span>
+                    <span id="statusText">Ready — add nodes to the list</span>
                 </div>
                 <div class="speed-control w-48">
                     <span class="text-xs font-medium opacity-60">Speed</span>
@@ -308,83 +229,90 @@
                         class="range range-xs range-primary" />
                 </div>
             </div>
-
-            <div class="collapse collapse-arrow bg-base-200 rounded-xl border border-base-300">
-                <input type="checkbox" />
-                <div class="collapse-title">🎨 Customize Colors</div>
-                <div class="collapse-content">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                        <div class="color-row"><input type="color" id="scene_background" value="#2e2e2e" /><span
-                                class="color-label">Scene Background</span></div>
-                        <div class="color-row"><input type="color" id="cube_color" value="#ef4444" /><span
-                                class="color-label">Cube Color</span></div>
-                        <div class="color-row"><input type="color" id="cube_change_color" value="#ffffff" /><span
-                                class="color-label">Highlight Color</span></div>
-                        <div class="color-row"><input type="color" id="text_color" value="#facc15" /><span
-                                class="color-label">Text Color</span></div>
-                        <div class="color-row"><input type="color" id="sorted_color" value="#22c55e" /><span
-                                class="color-label">Sorted Color</span></div>
-                    </div>
-                </div>
-            </div>
         </div>
 
-        <!-- Right: Info + Code -->
         <div class="lg:col-span-2 flex flex-col gap-4">
             <div class="info-card">
-                <h2 class="font-bold text-lg mb-2">📊 Merge Sort</h2>
-                <p>Merge sort is a recursive divide-and-conquer algorithm that divide the input array into two halves,
-                    calls itself for the two halves, and then merges the two sorted halves.</p>
+                <h2 class="font-bold text-lg mb-2">🔗 Singly Linked List</h2>
+                <p>A linear data structure where elements are stored in nodes. Each node contains data and a pointer
+                    (next) to the next node in the sequence.</p>
                 <div class="complexity-badges">
-                    <span class="badge-item">⏱ Best: O(n log n)</span>
-                    <span class="badge-item">⏱ Average: O(n log n)</span>
-                    <span class="badge-item">⏱ Worst: O(n log n)</span>
-                    <span class="badge-item">💾 Space: O(n)</span>
-                    <span class="badge-item">✅ Stable</span>
+                    <span class="badge-item">⏱ Access: O(n)</span>
+                    <span class="badge-item">⏱ Search: O(n)</span>
+                    <span class="badge-item">⏱ Insertion: O(1)*</span>
+                    <span class="badge-item">⏱ Deletion: O(1)*</span>
                 </div>
+                <p class="text-xs mt-2 opacity-60">*O(1) if you have a reference to the node, otherwise O(n) to find it.
+                </p>
             </div>
 
             <div class="code-block">
-                <div class="code-header"><span class="code-lang">Python</span><button class="copy-btn"
-                        data-target="python-code" onclick="copyCode(this)">Copy</button></div>
-                <pre><code id="python-code" class="language-python">def merge_sort(arr):
-    if len(arr) > 1:
-        mid = len(arr) // 2
-        L = arr[:mid]
-        R = arr[mid:]
-        merge_sort(L)
-        merge_sort(R)
-        i = j = k = 0
-        while i < len(L) and j < len(R):
-            if L[i] < R[j]:
-                arr[k] = L[i]; i += 1
-            else:
-                arr[k] = R[j]; j += 1
-            k += 1
-        while i < len(L):
-            arr[k] = L[i]; i += 1; k += 1
-        while j < len(R):
-            arr[k] = R[j]; j += 1; k += 1</code></pre>
+                <div class="code-header">
+                    <span class="code-lang">Python</span>
+                    <button class="copy-btn" data-target="python-code" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code id="python-code" class="language-python">class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def insert_at_head(self, data):
+        new_node = Node(data)
+        new_node.next = self.head
+        self.head = new_node
+
+    def delete_node(self, key):
+        temp = self.head
+        if temp and temp.data == key:
+            self.head = temp.next
+            return
+        prev = None
+        while temp and temp.data != key:
+            prev = temp
+            temp = temp.next
+        if temp:
+            prev.next = temp.next</code></pre>
             </div>
 
             <div class="code-block">
-                <div class="code-header"><span class="code-lang">JavaScript</span><button class="copy-btn"
-                        data-target="js-code" onclick="copyCode(this)">Copy</button></div>
-                <pre><code id="js-code" class="language-javascript">function mergeSort(arr) {
-  if (arr.length <= 1) return arr;
-  const mid = Math.floor(arr.length / 2);
-  const left = mergeSort(arr.slice(0, mid));
-  const right = mergeSort(arr.slice(mid));
-  return merge(left, right);
+                <div class="code-header">
+                    <span class="code-lang">JavaScript</span>
+                    <button class="copy-btn" data-target="js-code" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code id="js-code" class="language-javascript">class Node {
+    constructor(data) {
+        this.data = data;
+        this.next = null;
+    }
 }
 
-function merge(left, right) {
-  let result = [], i = 0, j = 0;
-  while (i < left.length && j < right.length) {
-    if (left[i] < right[j]) result.push(left[i++]);
-    else result.push(right[j++]);
-  }
-  return result.concat(left.slice(i)).concat(right.slice(j));
+class LinkedList {
+    constructor() {
+        this.head = null;
+    }
+
+    insertAtHead(data) {
+        const newNode = new Node(data);
+        newNode.next = this.head;
+        this.head = newNode;
+    }
+
+    deleteNode(key) {
+        let temp = this.head, prev = null;
+        if (temp && temp.data === key) {
+            this.head = temp.next;
+            return;
+        }
+        while (temp && temp.data !== key) {
+            prev = temp;
+            temp = temp.next;
+        }
+        if (temp) prev.next = temp.next;
+    }
 }</code></pre>
             </div>
         </div>
@@ -403,7 +331,7 @@ function merge(left, right) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script type="module" src="/src/javascript/merge_sort.js"></script>
+    <script type="module" src="/src/javascript/linked_list.js"></script>
 </body>
 
 </html>

@@ -13,7 +13,7 @@ let tokens = []; // Array of meshes
 let isAnimating = false;
 let globalFont = null;
 let refillInterval = null;
-let emptyTextMesh = null;
+let lastDropTime = 0;
 
 // Colors
 let sceneBG = "#2e2e2e";
@@ -35,14 +35,6 @@ function setStatus(msg, animating = false) {
 function updateTokenCount() {
     if (tokenCountSpan) {
         tokenCountSpan.textContent = tokens.length;
-    }
-    if (emptyTextMesh) {
-        emptyTextMesh.visible = (tokens.length === 0);
-        if (tokens.length === 0) {
-            // Small bounce animation to attract attention
-            emptyTextMesh.scale.set(0, 0, 0);
-            gsap.to(emptyTextMesh.scale, { x: 1, y: 1, z: 1, duration: 0.5, ease: "elastic.out(1, 0.5)" });
-        }
     }
 }
 
@@ -119,21 +111,11 @@ const fontLoader = new FontLoader();
 fontLoader.load("/helvetiker_regular.typeface.json", (font) => {
     globalFont = font;
 
-    // Create 'EMPTY' text
-    const textGeo = new TextGeometry("EMPTY", { font: globalFont, size: 0.5, height: 0.2 });
-    textGeo.computeBoundingBox();
-    const textW = textGeo.boundingBox.max.x - textGeo.boundingBox.min.x;
-    const textMat = new THREE.MeshStandardMaterial({ color: 0xff4444, emissive: 0xff4444, emissiveIntensity: 0.6 });
-    emptyTextMesh = new THREE.Mesh(textGeo, textMat);
-    emptyTextMesh.position.set(-textW / 2, 4, 0);
-    emptyTextMesh.visible = false;
-    scene.add(emptyTextMesh);
-
     queueNextRefill();
-    // Pre-fill a few tokens
-    addToken();
-    addToken();
-    addToken();
+    // Pre-fill a few tokens with a slight stagger
+    setTimeout(() => addToken(), 100);
+    setTimeout(() => addToken(), 600);
+    setTimeout(() => addToken(), 1100);
 });
 
 function createTokenMesh() {
@@ -164,6 +146,8 @@ function queueNextRefill() {
     const delay = REFILL_RATE_MS / speed;
 
     refillInterval = setTimeout(() => {
+        // Only refill if we aren't at capacity and no tokens are currently mid-drop in the last 0.5s
+        // to prevent overlapping animations.
         if (tokens.length < CAPACITY) {
             addToken();
         }
@@ -172,12 +156,20 @@ function queueNextRefill() {
 }
 
 function addToken() {
+    const now = Date.now();
+    // Ensure at least 300ms between any two token drops to prevent visual clumping
+    if (now - lastDropTime < 300) {
+        setTimeout(addToken, 300 - (now - lastDropTime));
+        return;
+    }
+    lastDropTime = now;
+
     if (tokens.length >= CAPACITY) return;
 
     const token = createTokenMesh();
 
-    // Start way above the bucket
-    token.position.set(0, CAPACITY * 0.8 + 5, 0);
+    // Start way above the bucket with slight spatial jitter
+    token.position.set((Math.random() - 0.5) * 0.2, CAPACITY * 0.8 + 5, (Math.random() - 0.5) * 0.2);
     scene.add(token);
     tokens.push(token);
 
@@ -188,12 +180,14 @@ function addToken() {
 
     gsap.to(token.position, {
         y: targetY,
-        duration: 0.6,
+        x: 0,
+        z: 0,
+        duration: 0.6 + Math.random() * 0.2,
         ease: "bounce.out"
     });
 }
 
-function animateRejectedRequests(amount) {
+function animateRejectedRequests(amount, startIndex = 0) {
     for (let i = 0; i < amount; i++) {
         const group = new THREE.Group();
         // A red cube to represent an invalid/rejected request packet
@@ -211,7 +205,7 @@ function animateRejectedRequests(amount) {
         group.add(mesh);
 
         // Spawn coming in from the left
-        group.position.set(-8, 3 + (i * 1.5), 2);
+        group.position.set(-8, 3 + ((i + startIndex) * 1.5), 2);
         scene.add(group);
 
         const tl = gsap.timeline({ onComplete: () => scene.remove(group) });
@@ -227,7 +221,7 @@ function animateRejectedRequests(amount) {
     }
 }
 
-function animateSuccessfulRequests(amount) {
+function animateSuccessfulRequests(amount, startIndex = 0) {
     for (let i = 0; i < amount; i++) {
         const group = new THREE.Group();
         // A blue cube to represent a valid/accepted request packet
@@ -245,14 +239,14 @@ function animateSuccessfulRequests(amount) {
         group.add(mesh);
 
         // Spawn coming in from the left
-        group.position.set(-8, 3 + (i * 1.5), 2);
+        group.position.set(-8, 3 + ((i + startIndex) * 1.5), 2);
         scene.add(group);
 
         const tl = gsap.timeline({ onComplete: () => scene.remove(group) });
         // Fly towards the bucket
         tl.to(group.position, { x: 0, y: 3, z: 0, duration: 0.3, ease: "power2.out" });
         // Fly out to the right (success)
-        tl.to(group.position, { x: 8, y: 4 + (i * 0.5), z: 2, duration: 0.5, ease: "power2.in" });
+        tl.to(group.position, { x: 8, y: 4 + ((i + startIndex) * 0.5), z: 2, duration: 0.5, ease: "power2.in" });
         // Shrink away at the very end
         tl.to(group.scale, { x: 0, y: 0, z: 0, duration: 0.2 }, "-=0.2");
 
@@ -264,42 +258,53 @@ function animateSuccessfulRequests(amount) {
 function sendRequest(amount) {
     if (!globalFont) return;
 
-    if (tokens.length < amount) {
-        setStatus(`Rate Limited! Need ${amount} token(s) but only have ${tokens.length}.`, true);
-        // Flash the bucket box to indicate denial
+    const acceptedCount = Math.min(amount, tokens.length);
+    const rejectedCount = amount - acceptedCount;
+
+    if (rejectedCount > 0) {
+        if (acceptedCount === 0) {
+            setStatus(`Rate Limited! Need ${amount} token(s) but bucket is empty.`, true);
+        } else {
+            setStatus(`${acceptedCount} request(s) sent, ${rejectedCount} rate limited.`, true);
+        }
+
+        // Flash the bucket box to indicate some denial
         gsap.to(bucketMaterial.color, { r: 1, g: 0.2, b: 0.2, duration: 0.2, yoyo: true, repeat: 3 });
         setTimeout(() => {
             bucketMaterial.color.set(containerColor);
         }, 1000);
 
         // Animate the rejected requests bouncing off
-        animateRejectedRequests(amount);
-        return;
+        animateRejectedRequests(rejectedCount, acceptedCount);
     }
 
-    setStatus(`Processing request (${amount} tokens used)...`, true);
+    if (acceptedCount > 0) {
+        if (rejectedCount === 0) {
+            setStatus(`Processing request (${amount} tokens used)...`, true);
+        }
 
-    // Animate the requests going right through
-    animateSuccessfulRequests(amount);
+        // Animate the requests going right through
+        animateSuccessfulRequests(acceptedCount, 0);
 
-    // We need to pop 'amount' tokens from the top of the stack
-    for (let i = 0; i < amount; i++) {
-        const token = tokens.pop();
+        // We need to pop 'acceptedCount' tokens from the top of the stack
+        for (let i = 0; i < acceptedCount; i++) {
+            const token = tokens.pop();
 
-        // Token flies up and right, following the accepted request
-        // Wait 0.3s before flying off so the blue incoming packet has time to arrive
-        gsap.to(token.position, {
-            x: 5,
-            y: token.position.y + 4,
-            z: 1,
-            duration: 0.5,
-            delay: 0.3,
-            ease: "power2.in"
-        });
+            // Token flies up and right, following the accepted request
+            // Wait 0.3s before flying off so the blue incoming packet has time to arrive
+            gsap.to(token.position, {
+                x: 5,
+                y: token.position.y + 4,
+                z: 1,
+                duration: 0.5,
+                delay: 0.3,
+                ease: "power2.in"
+            });
 
-        gsap.to(token.scale, { x: 0, y: 0, z: 0, duration: 0.3, delay: 0.6 });
+            gsap.to(token.scale, { x: 0, y: 0, z: 0, duration: 0.3, delay: 0.6 });
 
-        setTimeout(() => scene.remove(token), 900);
+            setTimeout(() => scene.remove(token), 900);
+        }
     }
 
     updateTokenCount();
